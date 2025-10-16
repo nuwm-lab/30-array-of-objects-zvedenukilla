@@ -1,54 +1,51 @@
 using System;
 
-namespace LabWork
-{    class Cone
+namespace Lab3oop
+{
+    class Person
     {
-        private readonly double _baseX;
-        private readonly double _baseY;
-        private readonly double _baseZ;
-        private readonly double _apexX;
-        private readonly double _apexY;
-        private readonly double _apexZ;
-        private readonly double _radius;
+        private string name;
+        private int day;
+        private int month;
+        private int year;
 
-        public Cone(double baseX, double baseY, double baseZ,
-                    double apexX, double apexY, double apexZ,
-                    double radius)
+        public Person(string name, int day, int month, int year)
         {
-            if (radius <= 0)
-                throw new ArgumentException("Радіус повинен бути додатним числом", nameof(radius));
-
-            _baseX = baseX;
-            _baseY = baseY;
-            _baseZ = baseZ;
-            _apexX = apexX;
-            _apexY = apexY;
-            _apexZ = apexZ;
-            _radius = radius;
+            this.name = name;
+            this.day = day;
+            this.month = month;
+            this.year = year;
         }
 
-                private double CalculateHeight()
+        private int SumOfDigits(int number)
         {
-            double dx = _apexX - _baseX;
-            double dy = _apexY - _baseY;
-            double dz = _apexZ - _baseZ;
-
-            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            int sum = 0;
+            while (number > 0)
+            {
+                sum += number % 10;
+                number /= 10;
+            }
+            return sum;
         }
 
-        
-        public double GetSlantHeight()
+        public bool IsLuckyDay()
         {
-            double height = CalculateHeight();
-            return Math.Sqrt(_radius * _radius + height * height);
+            int daySum = SumOfDigits(day);
+            int monthSum = SumOfDigits(month);
+            int yearSum = SumOfDigits(year);
+
+            int dayRemainder = daySum % 7;
+            int monthRemainder = monthSum % 7;
+            int yearRemainder = yearSum % 7;
+
+            return (dayRemainder == monthRemainder) && (monthRemainder == yearRemainder);
         }
 
-        
-        public override string ToString()
+        public void Print()
         {
-            return $"Конус: Основа({_baseX:F1}, {_baseY:F1}, {_baseZ:F1}), " +
-                   $"Вершина({_apexX:F1}, {_apexY:F1}, {_apexZ:F1}), " +
-                   $"Радіус={_radius:F2}, Твірна={GetSlantHeight():F2}";
+            Console.WriteLine($"Ім'я: {name}");
+            Console.WriteLine($"Дата народження: {day:D2}.{month:D2}.{year}");
+            Console.WriteLine($"Щасливий день: {(IsLuckyDay() ? "ТАК" : "НІ")}");
         }
     }
 
@@ -56,137 +53,53 @@ namespace LabWork
     {
         static void Main()
         {
-            Console.WriteLine("=== Пошук конуса з найбільшою твірною ===\n");
+            Console.Write("Введіть кількість людей: ");
+            int n = int.Parse(Console.ReadLine());
 
-    
-            Console.Write("Введіть кількість конусів (n): ");
-            if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
-            {
-                Console.WriteLine("Помилка: введіть додатне ціле число!");
-                return;
-            }
+            Person[] people = new Person[n];
 
-           
-            Cone[] cones = new Cone[n];
-
-           
             for (int i = 0; i < n; i++)
             {
-                Console.WriteLine($"\n--- Конус #{i + 1} ---");
+                Console.WriteLine($"\nЛюдина #{i + 1}:");
+                Console.Write("Ім'я: ");
+                string name = Console.ReadLine();
+                Console.Write("День народження (1-31): ");
+                int day = int.Parse(Console.ReadLine());
+                Console.Write("Місяць народження (1-12): ");
+                int month = int.Parse(Console.ReadLine());
+                Console.Write("Рік народження: ");
+                int year = int.Parse(Console.ReadLine());
 
-                Console.Write("Центр основи - X: ");
-                if (!double.TryParse(Console.ReadLine(), out double baseX))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Центр основи - Y: ");
-                if (!double.TryParse(Console.ReadLine(), out double baseY))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Центр основи - Z: ");
-                if (!double.TryParse(Console.ReadLine(), out double baseZ))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Вершина - X: ");
-                if (!double.TryParse(Console.ReadLine(), out double apexX))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Вершина - Y: ");
-                if (!double.TryParse(Console.ReadLine(), out double apexY))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Вершина - Z: ");
-                if (!double.TryParse(Console.ReadLine(), out double apexZ))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                Console.Write("Радіус основи: ");
-                if (!double.TryParse(Console.ReadLine(), out double radius))
-                {
-                    Console.WriteLine("Помилка вводу! Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                    continue;
-                }
-
-                try
-                {
-                    cones[i] = new Cone(baseX, baseY, baseZ, apexX, apexY, apexZ, radius);
-                }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine($"Помилка: {ex.Message}. Використовую тестові дані.");
-                    cones[i] = GenerateTestCone(i);
-                }
+                people[i] = new Person(name, day, month, year);
             }
 
-        
-            Console.WriteLine("\n=== Всі конуси ===\n");
-            for (int i = 0; i < cones.Length; i++)
+            Console.WriteLine("\n=== Всі люди ===\n");
+            for (int i = 0; i < n; i++)
             {
-                Console.WriteLine($"#{i + 1}: {cones[i]}");
+                Console.WriteLine($"Людина #{i + 1}:");
+                people[i].Print();
+                Console.WriteLine();
             }
 
+            // Визначення людей, які народилися в щасливі дні
+            Console.WriteLine("=== Люди, народжені в щасливі дні ===\n");
+            bool foundLucky = false;
             
-            Cone maxCone = cones[0];
-            double maxSlantHeight = maxCone.GetSlantHeight();
-
-            for (int i = 1; i < cones.Length; i++)
+            for (int i = 0; i < n; i++)
             {
-                double currentSlantHeight = cones[i].GetSlantHeight();
-                if (currentSlantHeight > maxSlantHeight)
+                if (people[i].IsLuckyDay())
                 {
-                    maxSlantHeight = currentSlantHeight;
-                    maxCone = cones[i];
+                    Console.WriteLine($"Людина #{i + 1}:");
+                    people[i].Print();
+                    Console.WriteLine();
+                    foundLucky = true;
                 }
             }
 
-           
-            Console.WriteLine("\n=== Результат ===\n");
-            Console.WriteLine("Конус з найбільшою твірною:");
-            Console.WriteLine(maxCone);
-        }
-
-        
-        private static Cone GenerateTestCone(int index)
-        {
-        
-            double[][] testData = new double[][]
+            if (!foundLucky)
             {
-                new double[] { 0, 0, 0, 0, 0, 5, 3 },      
-                new double[] { 1, 1, 1, 1, 1, 8, 4 },       
-                new double[] { -2, 0, 0, -2, 0, 10, 5 },    
-                new double[] { 0, 0, 0, 3, 4, 0, 2 },       
-                new double[] { 0, 0, 0, 0, 0, 12, 5 }      
-            };
-
-            int idx = index % testData.Length;
-            return new Cone(
-                testData[idx][0], testData[idx][1], testData[idx][2],  
-                testData[idx][3], testData[idx][4], testData[idx][5],  
-                testData[idx][6]                                        
-            );
+                Console.WriteLine("Немає людей, які народилися в щасливі дні.");
+            }
         }
     }
 }
